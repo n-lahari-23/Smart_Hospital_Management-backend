@@ -1,5 +1,6 @@
 package com.hospital.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -14,6 +15,7 @@ public class AppointmentDTO {
     private String doctorName;
     private String doctorSpecialization;
     private String departmentName;
+    private BigDecimal consultationFee;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
     private Integer tokenNumber;
@@ -43,6 +45,8 @@ public class AppointmentDTO {
     public void setDoctorSpecialization(String doctorSpecialization) { this.doctorSpecialization = doctorSpecialization; }
     public String getDepartmentName() { return departmentName; }
     public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
+    public BigDecimal getConsultationFee() { return consultationFee; }
+    public void setConsultationFee(BigDecimal consultationFee) { this.consultationFee = consultationFee; }
     public LocalDate getAppointmentDate() { return appointmentDate; }
     public void setAppointmentDate(LocalDate appointmentDate) { this.appointmentDate = appointmentDate; }
     public LocalTime getAppointmentTime() { return appointmentTime; }

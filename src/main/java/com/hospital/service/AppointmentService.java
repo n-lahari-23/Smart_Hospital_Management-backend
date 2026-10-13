@@ -121,6 +121,7 @@ public class AppointmentService {
             if (app.getDoctor().getDepartment() != null) {
                 dto.setDepartmentName(app.getDoctor().getDepartment().getName());
             }
+            dto.setConsultationFee(app.getDoctor().getConsultationFee());
         }
         dto.setAppointmentDate(app.getAppointmentDate());
         dto.setAppointmentTime(app.getAppointmentTime());
