@@ -55,7 +55,6 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     @Override
-    @Transactional
     public void run(ApplicationArguments args) {
         log.info("Checking and initializing Smart Hospital database records...");
         modernizeAppointmentSlotIndex();
