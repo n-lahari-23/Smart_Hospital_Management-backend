@@ -46,10 +46,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-             .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/error", "/api/health").permitAll()
-                  .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/appointments/available-slots").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/doctors/**").permitAll()
                 .anyRequest().authenticated()
             )

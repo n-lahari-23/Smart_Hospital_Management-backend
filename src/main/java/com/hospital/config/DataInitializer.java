@@ -38,29 +38,57 @@ public class DataInitializer implements ApplicationRunner {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     public DataInitializer(DepartmentRepository departmentRepository,
                            UserRepository userRepository,
                            DoctorRepository doctorRepository,
                            PatientRepository patientRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
         log.info("Checking and initializing Smart Hospital database records...");
+        modernizeAppointmentSlotIndex();
         initDepartments();
         initAdminUser();
         linkExistingDoctorUsers();
         initIndianDoctors();
         initDemoPatients();
         log.info("Smart Hospital database verification completed successfully.");
+    }
+
+    private void modernizeAppointmentSlotIndex() {
+        try {
+            Integer count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'appointments' AND index_name = 'unique_doc_slot'",
+                    Integer.class
+            );
+            if (count != null && count > 0) {
+                log.info("Modernizing appointments index: dropping legacy rigid unique_doc_slot index...");
+                jdbcTemplate.execute("ALTER TABLE appointments DROP INDEX unique_doc_slot");
+            }
+
+            Integer activeCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'appointments' AND index_name = 'unique_active_doc_slot'",
+                    Integer.class
+            );
+            if (activeCount == null || activeCount == 0) {
+                log.info("Creating active slot unique index (unique_active_doc_slot) to support immediate slot release upon cancellation...");
+                jdbcTemplate.execute("CREATE UNIQUE INDEX unique_active_doc_slot ON appointments (doctor_id, appointment_date, appointment_time, (CASE WHEN status != 'CANCELLED' THEN 1 ELSE NULL END))");
+            }
+        } catch (Exception e) {
+            log.warn("Note on slot index modernization: {}", e.getMessage());
+        }
     }
 
     private void initDepartments() {

@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "appointments", uniqueConstraints = {
-    @UniqueConstraint(name = "unique_doc_slot", columnNames = {"doctor_id", "appointment_date", "appointment_time"})
-})
+@Table(name = "appointments")
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
